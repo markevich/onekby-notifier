@@ -22,28 +22,15 @@ class Crawler
   def collect_offers(categories)
     categories.each do |category|
       @session.visit(category[:inner_link])
-      offers = deep_collect_offers()
-      table = @session.evaluate_script("$('table.fs-lrg').html()")
-      doc = Nokogiri::HTML(table)
-      rows = doc.xpath('//tbody/tr')
-      details = rows.collect do |row|
-        detail = {}
-        [
-          [:title, 'td[1]'],
-          [:position, 'td[2]'],
-          [:bet, 'td[3]'],
-        ].each do |name, xpath|
-          detail[name] = row.at_xpath(xpath).text.strip
-        end
-        detail
-      end
-
-      debugger
-      1
+      offers = deep_collect_offers(1)
+      # exclude_without_offers(offers)
+      category[:offers] = offers
     end
+    categories
   end
 
-  def deep_collect_offers
+  def deep_collect_offers(page)
+    @session.has_css?('span.pages', text: page.to_s)
     table = @session.evaluate_script("$('table.fs-lrg').html()")
     doc = Nokogiri::HTML(table)
     rows = doc.xpath('//tbody/tr')
@@ -58,11 +45,13 @@ class Crawler
       end
       detail
     end
+    details = [{ page: page, details: details }]
     return details unless @session.has_link?('Следующая')
-    @session.click_link('Следующая')
+    Rails.logger.info("Clicked #{page + 1} page")
+    @session.click_link((page + 1).to_s)
 
-    details << deep_collect_offers.flatten
-    details
+    deep_offers = deep_collect_offers(page + 1).flatten
+    details.concat(deep_offers)
   end
 
   def exclude_without_offers(rows)

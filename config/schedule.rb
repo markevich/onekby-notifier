@@ -18,3 +18,11 @@
 # end
 
 # Learn more: http://github.com/javan/whenever
+
+every '*/10 09-18 * * 1-5 /home/ramesh/bin/check-db-status' do
+  runner 'Crawler.start(:sport)'
+end
+
+every '*/10 09-18 * * 1-5 /home/ramesh/bin/check-db-status' do
+  runner 'Crawler.start(:tech)'
+end

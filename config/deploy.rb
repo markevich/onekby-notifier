@@ -1,6 +1,9 @@
 require "bundler/capistrano"
 require 'capistrano-rbenv'
 
+set :whenever_command, "bundle exec whenever"
+require "whenever/capistrano"
+
 set :application, "onekby-notifier"
 set :deploy_to, "/home/deployer/#{application}"
 

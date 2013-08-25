@@ -19,6 +19,8 @@ gem 'capybara'
 gem 'selenium-webdriver'
 gem 'poltergeist'
 
+gem 'whenever', :require => false
+
 gem 'haml-rails'
 
 group :development do

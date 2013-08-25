@@ -21,10 +21,10 @@
 
 job_type :runner, "cd :path && bin/rails runner -e :environment ':task' :output"
 
-every '*/10 08-17 * * 1-5 /home/ramesh/bin/check-db-status' do
+every '*/10 08-17 * * 1-5' do
   runner 'Crawler.start(:sport)'
 end
 
-every '*/10 08-17 * * 1-5 /home/ramesh/bin/check-db-status' do
+every '*/10 08-17 * * 1-5' do
   runner 'Crawler.start(:tech)'
 end

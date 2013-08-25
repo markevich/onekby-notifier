@@ -19,6 +19,8 @@
 
 # Learn more: http://github.com/javan/whenever
 
+job_type :runner, "cd :path && bin/rails runner -e :environment ':task' :output"
+
 every '*/10 08-17 * * 1-5 /home/ramesh/bin/check-db-status' do
   runner 'Crawler.start(:sport)'
 end

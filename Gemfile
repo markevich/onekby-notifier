@@ -17,6 +17,13 @@ gem 'jbuilder', '~> 1.2'
 
 gem 'capybara'
 gem 'selenium-webdriver'
+gem 'poltergeist'
+
+gem 'haml-rails'
+
+group :development do
+  gem 'letter_opener'
+end
 
 group :doc do
   gem 'sdoc', require: false
@@ -27,6 +34,6 @@ end
 # gem 'unicorn'
 
 # Use Capistrano for deployment
-# gem 'capistrano', group: :development
+gem 'capistrano', group: :development
 
 gem 'debugger', group: [:development, :test]

@@ -1,0 +1,15 @@
+- @offers.each do |category|
+
+  %h2
+    = link_to category[:title], "http://1k.by#{category[:inner_link]}"
+    -# = category[:offers].inspect
+  - category[:offers].to_a.each do |page|
+    %br
+    .page{style: "padding-left:100px"}
+      Страница
+      = page[:page]
+      = "Все ок" if page[:offers].empty?
+      - page[:offers].to_a.each do |offer|
+        .offer{style: "padding-left:200px"}
+          .title
+            #{offer[:title]}    #{offer[:position]}

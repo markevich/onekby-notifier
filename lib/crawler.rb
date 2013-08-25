@@ -1,62 +1,90 @@
 require 'capybara/rails'
+require 'capybara/poltergeist'
 Capybara.run_server = false
 Capybara.app_host = 'http://1k.by'
+Capybara.default_wait_time = 5
 
 class Crawler
-  def self.start
-    new.start
+  def self.start(store)
+    new.start(store)
   end
 
-  def start
+  def start(store)
     @session = Capybara::Session.new(:selenium)
-    auth()
+    auth(store)
     visit_catalog()
-    rows = get_promotions()
-    exclude_without_offers(rows)
-    offers = collect_offers(rows)
-    offers
+    promotions = get_promotions()
+    exclude_without_offers(promotions)
+    offers = collect_offers(promotions)
+    offers = sort(offers)
+    if store == :tech
+      LostOffers.lost_tech(offers).deliver!
+    elsif store == :sport
+      LostOffers.lost_sport(offers).deliver!
+    end
   end
 
   private
 
-  def collect_offers(categories)
-    categories.each do |category|
-      @session.visit(category[:inner_link])
-      offers = deep_collect_offers(1)
-      # exclude_without_offers(offers)
-      category[:offers] = offers
-    end
-    categories
+  def sort(offers)
+    offers.sort_by {|o| o[:title]}
   end
 
-  def deep_collect_offers(page)
-    @session.has_css?('span.pages', text: page.to_s)
+  def collect_offers(promotions)
+    promotions.each do |promotion|
+      @session.visit(promotion[:inner_link])
+      offers = deep_collect_offers(1)
+      delete_inactive_or_winning(offers)
+      promotion[:offers] = offers
+    end
+    promotions
+  end
+
+  def delete_inactive_or_winning(categories)
+    categories.each do |category|
+      category[:offers].delete_if do |offer|
+        #1.0/1.0 (2)
+        regexp = /\d+\.\d+\/\d+\.\d+\s\((.+)\)/
+        match_data = offer[:position].match(regexp)
+
+        if match_data
+          match_data[1].to_i <= 1
+        else
+          true
+        end
+
+      end
+    end
+  end
+
+  def deep_collect_offers(page_number)
+    @session.has_css?('span.pages', text: page_number.to_s)
     table = @session.evaluate_script("$('table.fs-lrg').html()")
     doc = Nokogiri::HTML(table)
     rows = doc.xpath('//tbody/tr')
-    details = rows.collect do |row|
-      detail = {}
+    offers = rows.collect do |row|
+      offer = {}
       [
         [:title, 'td[1]'],
         [:position, 'td[2]'],
         [:bet, 'td[3]'],
       ].each do |name, xpath|
-        detail[name] = row.at_xpath(xpath).text.strip
+        offer[name] = row.at_xpath(xpath).text.strip
       end
-      detail
+      offer
     end
-    details = [{ page: page, details: details }]
-    return details unless @session.has_link?('Следующая')
-    Rails.logger.info("Clicked #{page + 1} page")
-    @session.click_link((page + 1).to_s)
+    offers = [{ page: page_number, offers: offers }]
+    return offers unless @session.has_link?('Следующая')
+    Rails.logger.info("Clicked #{page_number + 1} page")
+    @session.click_link((page_number + 1).to_s)
 
-    deep_offers = deep_collect_offers(page + 1).flatten
-    details.concat(deep_offers)
+    deep_offers = deep_collect_offers(page_number + 1).flatten
+    offers.concat(deep_offers)
   end
 
-  def exclude_without_offers(rows)
-    rows.delete_if do |row|
-      row[:offers_count].to_i == 0
+  def exclude_without_offers(promotions)
+    promotions.delete_if do |promotion|
+      promotion[:offers_count].to_i == 0
     end
   end
 
@@ -64,9 +92,13 @@ class Crawler
     @session.visit('/users/shops-productscategoriespromotion')
   end
 
-  def auth()
+  def auth(store)
     @session.visit('/')
-    set_cookies()
+    if store == :sport
+      set_cookies_for_sport
+    elsif store == :tech
+      set_cookies_for_tech
+    end
     @session.visit('/')
   end
 
@@ -92,17 +124,51 @@ class Crawler
     details
   end
 
-  def set_cookies
-    @session.driver.browser.manage.add_cookie(name: '__userid', value: '22261',
-                                              expire: (Date.today + 1.month).to_s,
-                                              domain: '1k.by', path: '/')
+  def set_cookies_for_tech
+    if @session.mode == :selenium
+      @session.driver.browser.manage.add_cookie(name: '__userid', value: '22261',
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
 
-    @session.driver.browser.manage.add_cookie(name: '__checksum', value: 'aa3ee85b644cb0abc4ba979bf7818c67',
-                                              expire: (Date.today + 1.month).to_s,
-                                              domain: '1k.by', path: '/')
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: 'aa3ee85b644cb0abc4ba979bf7818c67',
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
 
-    @session.driver.browser.manage.add_cookie(name: 'bbsessionhash', value: '326b15a783acbe3c4df5c5d2c7db4ec2',
-                                              expire: (Date.today + 1.month).to_s,
-                                              domain: '1k.by', path: '/')
+      @session.driver.browser.manage.add_cookie(name: 'bbsessionhash', value: '326b15a783acbe3c4df5c5d2c7db4ec2',
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
+    elsif @session.mode == :poltergeist
+      @session.driver.set_cookie('__userid', '22261',
+                                 expires: (Time.now + 1.month))
+
+      @session.driver.set_cookie('__checksum', 'aa3ee85b644cb0abc4ba979bf7818c67',
+                                 expires: (Time.now + 1.month))
+
+    end
+
   end
+
+
+  def set_cookies_for_sport
+    if @session.mode == :selenium
+      @session.driver.browser.manage.add_cookie(name: '__userid', value: '25549',
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
+
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '7e5e468736301797ccc936783e50af1c',
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
+
+    elsif @session.mode == :poltergeist
+      @session.driver.set_cookie('__userid', '25549',
+                                 expires: (Time.now + 1.month))
+
+      @session.driver.set_cookie('__checksum', '7e5e468736301797ccc936783e50af1c',
+                                 expires: (Time.now + 1.month))
+
+
+    end
+
+  end
+
 end

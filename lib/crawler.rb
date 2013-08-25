@@ -10,7 +10,7 @@ class Crawler
   end
 
   def start(store)
-    @session = Capybara::Session.new(:selenium)
+    @session = Capybara::Session.new(:poltergeist)
     auth(store)
     visit_catalog()
     promotions = get_promotions()

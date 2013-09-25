@@ -130,18 +130,15 @@ class Crawler
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '27ce181857e34b13536ef810cf6c5a75',
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '368e1f48bb3c5b56b9f2b3df03d6cfb4',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: 'bbsessionhash', value: '9e932564598ed3dc5dd878b1d64f13e1',
-                                                expire: (Date.today + 1.month).to_s,
-                                                domain: '1k.by', path: '/')
     elsif @session.mode == :poltergeist
       @session.driver.set_cookie('__userid', '22261',
                                  expires: (Time.now + 1.month))
 
-      @session.driver.set_cookie('__checksum', '27ce181857e34b13536ef810cf6c5a75',
+      @session.driver.set_cookie('__checksum', '368e1f48bb3c5b56b9f2b3df03d6cfb4',
                                  expires: (Time.now + 1.month))
 
     end

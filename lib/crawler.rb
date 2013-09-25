@@ -130,18 +130,18 @@ class Crawler
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '49920d87cd6cb10b1f10c4e8f4d6f3c3',
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '27ce181857e34b13536ef810cf6c5a75',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: 'bbsessionhash', value: '326b15a783acbe3c4df5c5d2c7db4ec2',
+      @session.driver.browser.manage.add_cookie(name: 'bbsessionhash', value: '9e932564598ed3dc5dd878b1d64f13e1',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
     elsif @session.mode == :poltergeist
       @session.driver.set_cookie('__userid', '22261',
                                  expires: (Time.now + 1.month))
 
-      @session.driver.set_cookie('__checksum', '49920d87cd6cb10b1f10c4e8f4d6f3c3',
+      @session.driver.set_cookie('__checksum', '27ce181857e34b13536ef810cf6c5a75',
                                  expires: (Time.now + 1.month))
 
     end
@@ -155,7 +155,7 @@ class Crawler
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '7e5e468736301797ccc936783e50af1c',
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '7ca4300756fd15c29e93c37af49a5ee0',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
@@ -163,7 +163,7 @@ class Crawler
       @session.driver.set_cookie('__userid', '25549',
                                  expires: (Time.now + 1.month))
 
-      @session.driver.set_cookie('__checksum', '7e5e468736301797ccc936783e50af1c',
+      @session.driver.set_cookie('__checksum', '7ca4300756fd15c29e93c37af49a5ee0',
                                  expires: (Time.now + 1.month))
 
 

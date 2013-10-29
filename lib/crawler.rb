@@ -130,7 +130,7 @@ class Crawler
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '368e1f48bb3c5b56b9f2b3df03d6cfb4',
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '135263ccd03c8a1c967491a968661227',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
@@ -138,7 +138,7 @@ class Crawler
       @session.driver.set_cookie('__userid', '22261',
                                  expires: (Time.now + 1.month))
 
-      @session.driver.set_cookie('__checksum', '368e1f48bb3c5b56b9f2b3df03d6cfb4',
+      @session.driver.set_cookie('__checksum', '135263ccd03c8a1c967491a968661227',
                                  expires: (Time.now + 1.month))
 
     end
@@ -152,7 +152,7 @@ class Crawler
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '7ca4300756fd15c29e93c37af49a5ee0',
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '9d4354d187a3d88d00f20803c85b9573',
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')
 
@@ -160,7 +160,7 @@ class Crawler
       @session.driver.set_cookie('__userid', '25549',
                                  expires: (Time.now + 1.month))
 
-      @session.driver.set_cookie('__checksum', '7ca4300756fd15c29e93c37af49a5ee0',
+      @session.driver.set_cookie('__checksum', '9d4354d187a3d88d00f20803c85b9573',
                                  expires: (Time.now + 1.month))
 
 

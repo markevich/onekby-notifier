@@ -37,4 +37,6 @@ end
 
 # Use Capistrano for deployment
 gem 'capistrano', group: :development
+gem 'capistrano-rbenv', group: :development
+gem 'nokogiri', '1.6.1'
 

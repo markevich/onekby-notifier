@@ -5,29 +5,25 @@ Capybara.app_host = 'http://1k.by'
 Capybara.default_wait_time = 5
 
 class Crawler
-  def self.start(store)
-    new.start(store)
+  def self.start(bot)
+    new.start(bot)
   end
 
-  def start(store)
+  def start(bot)
     @session = Capybara::Session.new(:poltergeist)
-    auth(store)
-    visit_catalog()
-    promotions = get_promotions()
+    auth(bot)
+    visit_catalog
+    promotions = get_promotions
     exclude_without_offers(promotions)
     offers = collect_offers(promotions)
-    offers = sort(offers)
-    if store == :tech
-      LostOffers.lost_tech(offers).deliver!
-    elsif store == :sport
-      LostOffers.lost_sport(offers).deliver!
-    end
+    sort!(offers)
+    LostOffers.send(offers, bot).deliver!
   end
 
   private
 
-  def sort(offers)
-    offers.sort_by {|o| o[:title]}
+  def sort!(offers)
+    offers.sort_by! {|o| o[:title]}
   end
 
   def collect_offers(promotions)
@@ -47,12 +43,9 @@ class Crawler
         regexp = /\d+\.\d+\/\d+\.\d+\s\((.+)\)/
         match_data = offer[:position].match(regexp)
 
-        if match_data
-          match_data[1].to_i <= 1
-        else
-          true
-        end
+        return true unless match_data
 
+        match_data[1].to_i <= 1
       end
     end
   end
@@ -92,13 +85,26 @@ class Crawler
     @session.visit('/users/shops-productscategoriespromotion')
   end
 
-  def auth(store)
+  def auth(bot)
     @session.visit('/')
-    if store == :sport
-      set_cookies_for_sport
-    elsif store == :tech
-      set_cookies_for_tech
+
+    if @session.mode == :selenium
+      @session.driver.browser.manage.add_cookie(name: '__userid', value: bot.auth_user_id,
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
+
+      @session.driver.browser.manage.add_cookie(name: '__checksum', value: bot.auth_session_id,
+                                                expire: (Date.today + 1.month).to_s,
+                                                domain: '1k.by', path: '/')
+    elsif @session.mode == :poltergeist
+      @session.driver.set_cookie('__userid', bot.auth_user_id,
+                                 expires: (Time.now + 1.month))
+
+      @session.driver.set_cookie('__checksum', bot.auth_session_id,
+                                 expires: (Time.now + 1.month))
+
     end
+
     @session.visit('/')
   end
 
@@ -123,49 +129,4 @@ class Crawler
     end
     details
   end
-
-  def set_cookies_for_tech
-    if @session.mode == :selenium
-      @session.driver.browser.manage.add_cookie(name: '__userid', value: '22261',
-                                                expire: (Date.today + 1.month).to_s,
-                                                domain: '1k.by', path: '/')
-
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: '645f839adcb5699a5df816c5554d99c3',
-                                                expire: (Date.today + 1.month).to_s,
-                                                domain: '1k.by', path: '/')
-
-    elsif @session.mode == :poltergeist
-      @session.driver.set_cookie('__userid', '22261',
-                                 expires: (Time.now + 1.month))
-
-      @session.driver.set_cookie('__checksum', '645f839adcb5699a5df816c5554d99c3',
-                                 expires: (Time.now + 1.month))
-
-    end
-
-  end
-
-
-  def set_cookies_for_sport
-    if @session.mode == :selenium
-      @session.driver.browser.manage.add_cookie(name: '__userid', value: '25549',
-                                                expire: (Date.today + 1.month).to_s,
-                                                domain: '1k.by', path: '/')
-
-      @session.driver.browser.manage.add_cookie(name: '__checksum', value: 'f14ea2a33222f939bc20082c13dbdf58',
-                                                expire: (Date.today + 1.month).to_s,
-                                                domain: '1k.by', path: '/')
-
-    elsif @session.mode == :poltergeist
-      @session.driver.set_cookie('__userid', '25549',
-                                 expires: (Time.now + 1.month))
-
-      @session.driver.set_cookie('__checksum', 'f14ea2a33222f939bc20082c13dbdf58',
-                                 expires: (Time.now + 1.month))
-
-
-    end
-
-  end
-
 end

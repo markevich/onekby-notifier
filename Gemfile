@@ -34,9 +34,11 @@ end
 
 # Use unicorn as the app server
 # gem 'unicorn'
+#
+gem 'activeadmin', github: 'gregbell/active_admin'
 
 # Use Capistrano for deployment
 gem 'capistrano', group: :development
 gem 'capistrano-rbenv', group: :development
-gem 'nokogiri', '1.6.1'
+gem 'nokogiri'
 

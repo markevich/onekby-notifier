@@ -18,14 +18,17 @@ class Crawler
 
   def start(bot)
     @session = Capybara::Session.new(:poltergeist)
-
-    auth(bot)
-    visit_catalog
-    promotions = get_promotions
-    exclude_without_offers(promotions)
-    offers = collect_offers(promotions)
-    offers = sort(offers)
-    LostOffers.lost_offers(offers, bot).deliver!
+    begin
+      auth(bot)
+      visit_catalog
+      promotions = get_promotions
+      exclude_without_offers(promotions)
+      offers = collect_offers(promotions)
+      offers = sort(offers)
+      LostOffers.lost_offers(offers, bot).deliver!
+    ensure
+      @session.driver.quit
+    end
   end
 
   private

@@ -34,6 +34,7 @@ group :doc do
   gem 'sdoc', require: false
 end
 
+gem 'sinatra', '>= 1.3.0', :require => nil
 
 # Use unicorn as the app server
 gem 'unicorn'

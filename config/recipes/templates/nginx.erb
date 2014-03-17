@@ -1,0 +1,30 @@
+server {
+  listen 80;
+  server_name 1k.artoverflow.com;
+  root <%= current_path %>/public;
+  client_max_body_size 32m;
+
+  location ~ ^/(assets|uploads)/  {
+    root <%= current_path %>/public;
+    gzip_static on; # to serve pre-gzipped version
+    expires max;
+    add_header Vary Accept-Encoding;
+    add_header Cache-Control "public, max-age=31557600";
+  }
+
+  location ~ ^(.*)/favicon.ico$ {
+    rewrite ^(.*)/favicon.ico$ /favicon.ico break;
+  }
+
+  location / {
+    try_files $uri @unicorn;
+    break;
+  }
+
+  location @unicorn {
+    proxy_set_header  Client-Ip $remote_addr;
+    proxy_set_header  X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header  Host $host;
+    proxy_pass  http://unix:<%= unicorn_socket %>;
+  }
+}

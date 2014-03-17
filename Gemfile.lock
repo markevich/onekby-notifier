@@ -48,6 +48,7 @@ GEM
       activesupport (>= 3.0.0)
     arel (4.0.0)
     atomic (1.1.13)
+    awesome_print (1.2.0)
     bcrypt (3.1.7)
     bcrypt-ruby (3.1.5)
       bcrypt (>= 3.1.3)
@@ -72,9 +73,15 @@ GEM
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
       xpath (~> 2.0)
+    capybara-firebug (2.0.0)
+      capybara (>= 1.0, < 3.0)
+      selenium-webdriver
+    celluloid (0.15.2)
+      timers (~> 1.1.0)
     childprocess (0.3.9)
       ffi (~> 1.0, >= 1.0.11)
     chronic (0.6.7)
+    coderay (1.1.0)
     coffee-rails (4.0.0)
       coffee-script (>= 2.2.0)
       railties (>= 4.0.0.beta, < 5.0)
@@ -82,6 +89,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.3)
+    connection_pool (1.2.0)
     devise (3.2.3)
       bcrypt-ruby (~> 3.0)
       orm_adapter (~> 0.1)
@@ -126,6 +134,7 @@ GEM
     kaminari (0.15.1)
       actionpack (>= 3.0.0)
       activesupport (>= 3.0.0)
+    kgio (2.9.2)
     launchy (2.3.0)
       addressable (~> 2.3)
     letter_opener (1.1.2)
@@ -133,6 +142,7 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    method_source (0.8.2)
     mime-types (1.24)
     mini_portile (0.5.2)
     minitest (4.7.5)
@@ -155,6 +165,12 @@ GEM
     polyamorous (0.6.4)
       activerecord (>= 3.0)
     polyglot (0.3.3)
+    pry (0.9.12.6)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
+    pry-rails (0.3.2)
+      pry (>= 0.9.10)
     rack (1.5.2)
     rack-test (0.6.2)
       rack (>= 1.0)
@@ -171,6 +187,7 @@ GEM
       activesupport (= 4.0.0)
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
+    raindrops (0.13.0)
     rake (10.1.0)
     ransack (1.1.0)
       actionpack (>= 3.0)
@@ -178,6 +195,9 @@ GEM
       polyamorous (~> 0.6.0)
     rdoc (3.12.2)
       json (~> 1.4)
+    redis (3.0.7)
+    redis-namespace (1.4.1)
+      redis (~> 3.0.4)
     responders (1.0.0)
       railties (>= 3.2, < 5)
     rubyzip (0.9.9)
@@ -194,6 +214,13 @@ GEM
       multi_json (~> 1.0)
       rubyzip
       websocket (~> 1.0.4)
+    sidekiq (2.17.7)
+      celluloid (>= 0.15.2)
+      connection_pool (>= 1.0.0)
+      json
+      redis (>= 3.0.6)
+      redis-namespace (>= 1.3.1)
+    slop (3.4.7)
     sprockets (2.10.0)
       hike (~> 1.2)
       multi_json (~> 1.0)
@@ -207,6 +234,7 @@ GEM
     thread_safe (0.1.2)
       atomic
     tilt (1.4.1)
+    timers (1.1.0)
     treetop (1.4.14)
       polyglot
       polyglot (>= 0.3.1)
@@ -216,6 +244,10 @@ GEM
     uglifier (2.1.2)
       execjs (>= 0.3.0)
       multi_json (~> 1.0, >= 1.0.2)
+    unicorn (4.8.2)
+      kgio (~> 2.6)
+      rack
+      raindrops (~> 0.7)
     warden (1.2.3)
       rack (>= 1.0)
     websocket (1.0.7)
@@ -230,9 +262,11 @@ PLATFORMS
 
 DEPENDENCIES
   activeadmin!
+  awesome_print
   capistrano
   capistrano-rbenv
   capybara
+  capybara-firebug
   coffee-rails (~> 4.0.0)
   haml-rails
   jbuilder (~> 1.2)
@@ -241,10 +275,13 @@ DEPENDENCIES
   mysql2
   nokogiri
   poltergeist
+  pry-rails
   rails (= 4.0.0)
   sass-rails (~> 4.0.0)
   sdoc
   selenium-webdriver
+  sidekiq
   turbolinks
   uglifier (>= 1.3.0)
+  unicorn
   whenever

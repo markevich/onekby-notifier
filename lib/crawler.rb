@@ -1,5 +1,12 @@
 require 'capybara/rails'
 require 'capybara/poltergeist'
+Capybara.register_driver :selenium_firebug do |app|
+  require 'capybara/firebug'
+  profile = Selenium::WebDriver::Firefox::Profile.new
+  profile.enable_firebug
+  Capybara::Selenium::Driver.new(app, :profile => profile)
+end
+
 Capybara.run_server = false
 Capybara.app_host = 'http://1k.by'
 Capybara.default_wait_time = 5
@@ -11,19 +18,20 @@ class Crawler
 
   def start(bot)
     @session = Capybara::Session.new(:poltergeist)
+
     auth(bot)
     visit_catalog
     promotions = get_promotions
     exclude_without_offers(promotions)
     offers = collect_offers(promotions)
-    sort!(offers)
-    LostOffers.send(offers, bot).deliver!
+    offers = sort(offers)
+    LostOffers.lost_offers(offers, bot).deliver!
   end
 
   private
 
-  def sort!(offers)
-    offers.sort_by! {|o| o[:title]}
+  def sort(offers)
+    offers.sort_by {|o| o[:title]}
   end
 
   def collect_offers(promotions)
@@ -88,7 +96,7 @@ class Crawler
   def auth(bot)
     @session.visit('/')
 
-    if @session.mode == :selenium
+    if @session.mode == :selenium_firebug
       @session.driver.browser.manage.add_cookie(name: '__userid', value: bot.auth_user_id,
                                                 expire: (Date.today + 1.month).to_s,
                                                 domain: '1k.by', path: '/')

@@ -1,0 +1,64 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          sidekiq
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Manage sidekiq daemon
+# Description:       Start, stop, restart sidekiq daemon for a specific application.
+### END INIT INFO
+set -e
+
+# Feel free to change any of the following variables for your app:
+APP_ROOT=<%= current_path %>
+PID=<%= sidekiq_pid %>
+CMD="cd <%= current_path %>; nohup bundle exec sidekiq -e production -C <%= sidekiq_config %> -P <%= sidekiq_pid %> >> <%= sidekiq_log %> 2>&1 &"
+SIDEKIQCTL_CMD="cd <%= current_path %>; bundle exec sidekiqctl"
+
+AS_USER=<%= user %>
+set -u
+
+run () {
+    if [ "$(id -un)" = "$AS_USER" ]; then
+        eval $1
+    else
+        su -c "$1" - $AS_USER
+    fi
+}
+
+test_pid () {
+    if test -s "$PID"
+        then if kill -0 `cat $PID` > /dev/null 2>&1
+            then return 0 # process exists
+            else return 1 # process does not exist
+        fi
+        else return 1 # pid file does not exist
+    fi
+}
+
+case "$1" in
+
+    start)
+        test_pid && echo >&2 "Already running" && exit 0
+        run "$CMD"
+    ;;
+
+    stop)
+        test_pid && run "$SIDEKIQCTL_CMD stop $PID 10" && echo "Process stopped OK" && exit 0
+        echo >&2 "Not running"
+    ;;
+
+    restart)
+        test_pid && run "$SIDEKIQCTL_CMD stop $PID 10"
+        run "$CMD" && echo "Process restarted OK" && exit 0
+        echo >&2 "Couldn't restart"
+    ;;
+
+    *)
+        echo >&2 "Usage: $0 < start|stop|restart >"
+        exit 1
+    ;;
+
+esac
+

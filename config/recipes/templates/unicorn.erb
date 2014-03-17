@@ -1,0 +1,35 @@
+worker_processes 2
+timeout 300
+
+working_directory "<%= current_path %>"
+
+listen "<%= unicorn_socket %>", :backlog => 3064
+pid "<%= unicorn_pid %>"
+
+stderr_path "<%= unicorn_log %>"
+stdout_path "<%= unicorn_log %>"
+
+preload_app true
+
+before_fork do |server, worker|
+  if defined? ActiveRecord::Base
+    ActiveRecord::Base.connection.disconnect!
+  end
+
+  old_pid = "#{server.config[:pid]}.oldbin"
+  if File.exists?(old_pid) && server.pid != old_pid
+    begin
+      Process.kill("QUIT", File.read(old_pid).to_i)
+      # rescue Errno::ENOENT, Errno::ESRCH
+      # someone else did our job for us
+    end
+  end
+end
+
+after_fork do |server, worker|
+  # Start up the database connection again in the worker
+  if defined?(ActiveRecord::Base)
+    ActiveRecord::Base.establish_connection
+  end
+end
+

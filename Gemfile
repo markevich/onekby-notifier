@@ -25,6 +25,9 @@ gem 'haml-rails'
 
 group :development do
   gem 'letter_opener'
+  gem 'pry-rails'
+  gem 'awesome_print'
+  gem 'capybara-firebug'
 end
 
 group :doc do
@@ -33,9 +36,10 @@ end
 
 
 # Use unicorn as the app server
-# gem 'unicorn'
+gem 'unicorn'
 #
 gem 'activeadmin', github: 'gregbell/active_admin'
+gem 'sidekiq'
 
 # Use Capistrano for deployment
 gem 'capistrano', group: :development

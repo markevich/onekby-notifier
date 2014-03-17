@@ -4,6 +4,12 @@ require 'capistrano-rbenv'
 set :whenever_command, "bundle exec whenever"
 require "whenever/capistrano"
 
+load 'config/recipes/base'
+load 'config/recipes/nginx'
+load 'config/recipes/unicorn'
+load 'config/recipes/sidekiq'
+load 'config/recipes/monit'
+
 set :application, "onekby-notifier"
 set :deploy_to, "/home/deployer/#{application}"
 

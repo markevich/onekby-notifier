@@ -17,7 +17,7 @@ class Crawler
   end
 
   def start(bot)
-    @session = Capybara::Session.new(:poltergeist)
+    @session = Capybara::Session.new(:selenium_firebug)
     begin
       auth(bot)
       visit_catalog

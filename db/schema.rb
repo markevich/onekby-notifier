@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140315111756) do
+ActiveRecord::Schema.define(version: 20140722190053) do
 
   create_table "active_admin_comments", force: true do |t|
     t.string   "namespace"
@@ -53,6 +53,16 @@ ActiveRecord::Schema.define(version: 20140315111756) do
     t.datetime "updated_at"
     t.string   "notification_email"
     t.string   "auth_user_id"
+  end
+
+  create_table "categories", force: true do |t|
+    t.integer  "bot_id"
+    t.boolean  "enabled",    default: false
+    t.string   "name"
+    t.float    "max_bet",    default: 50.0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "link"
   end
 
 end

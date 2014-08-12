@@ -4,23 +4,32 @@ class Spider
   include BotConcern
 
   def initialize
-
   end
 
-  def start(bot_id: 2)
+  def self.start(bot_id: 2)
+    new.start(bot_id)
+  end
+
+  def start(bot_id)
     @bot = Bot.find(bot_id)
-    @session = Capybara::Session.new(:selenium_firebug)
-    auth(@bot)
-    visit_catalog
+    @session = Capybara::Session.new(:poltergeist)
 
-    categories = get_categories
-    save_categories(categories)
+    begin
+      auth(@bot)
+      visit_catalog
 
-    categories_processing
+      categories = get_categories
+      save_categories(categories)
+
+      categories_processing
+    ensure
+      @session.driver.quit
+    end
   end
 
   def categories_processing
     @bot.categories.where(enabled: true).each do |category|
+      # next unless category.id == 7
       @session.visit(category.link)
       go_through_category(1, category)
     end
@@ -28,29 +37,37 @@ class Spider
 
   def magic(offers)
     offers.each do |offer|
-      # TODO
-      next unless offers.first == offer
-
       @session.find(:xpath, "//a[contains(@onclick, 'productbid-#{offer[:product_id]}')]").click
 
-      table = @session.evaluate_script("$('#ui-id-2 table.fs-lrg').html()")
-      doc = Nokogiri::HTML(table)
-      rows = doc.xpath('//tbody/tr')
+      if offer[:raw_data].inner_html.include?('<span class="grey">-</span>')
+        @session.find(:css, '.ui-dialog')
+        new_bet = 1
+      else
+        @session.find(:css, '.ui-dialog table.fs-lrg')
+        table = @session.evaluate_script("$('.ui-dialog table.fs-lrg').html()")
+        doc = Nokogiri::HTML(table)
+        rows = doc.xpath('//tbody/tr')
 
-      good_bet = rows.reduce([]) do |result, row|
-        if row.attr('class') != 'tb-h' && row.at_xpath('td[3]').attr('class') != 'td3 red'
-          result << row.at_xpath('td[3]').text.to_f
+        good_bets = rows.reduce([]) do |result, row|
+          if row.attr('class') != 'tb-h' && row.at_xpath('td[3]').attr('class') != 'td3 red'
+            result << row.at_xpath('td[3]').text.to_f
+          end
+          result
         end
-        result
-      end.find do |bet|
-        bet < offer[:category][:max_bet] - INCREASE_STEP
+
+        good_bet = good_bets.find do |bet|
+          bet < offer[:category][:max_bet] - INCREASE_STEP
+        end
+        new_bet = good_bet ? good_bet + INCREASE_STEP : 1
       end
 
-      new_bet = good_bet ? good_bet + INCREASE_STEP : 1
+      Rails.logger.info("New bet #{new_bet} for #{offer[:product_id]}")
 
       @session.execute_script("$('#bidid').val('#{new_bet}')")
       @session.click_button('Сохранить')
+      @session.find("span", text: 'Информация сохранена')
       @session.find(:css, '.ui-icon-closethick').click
+      sleep 0.5
     end
   end
 
@@ -66,6 +83,12 @@ class Spider
       raw_bet = row.at_xpath('td[2]').text.strip
       position_regex = /(\d+\.\d+)\/(\d+\.\d+)\s\((.+)\)/
       position_parsed_data = raw_bet.match(position_regex)
+
+      if raw_bet == '-'
+        position_parsed_data = []
+        position_parsed_data[1] = 0
+        position_parsed_data[3] = 0
+      end
       next if position_parsed_data.nil? || position_parsed_data[3].nil?
 
       {
@@ -83,15 +106,9 @@ class Spider
       }
     end.compact
 
-    # TODO
-    # back = offers.first
-
     offers.delete_if do |offer|
       offer[:position] == 1
     end
-
-    # TODO
-    # offers << back
 
     magic(offers)
 

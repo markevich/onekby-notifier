@@ -3,7 +3,6 @@ class CrawlerWorker
   sidekiq_options :retry => false
 
   def perform(bot_id)
-    bot = Bot.find(bot_id)
-    Crawler.start(bot)
+    Spider.start(bot_id)
   end
 end

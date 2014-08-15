@@ -17,6 +17,7 @@ gem 'jbuilder', '~> 1.2'
 
 gem 'capybara'
 gem 'selenium-webdriver'
+gem 'capybara-firebug'
 gem 'poltergeist'
 
 gem 'whenever', :require => false
@@ -27,7 +28,6 @@ group :development do
   gem 'letter_opener'
   gem 'pry-rails'
   gem 'awesome_print'
-  gem 'capybara-firebug'
 end
 
 group :doc do

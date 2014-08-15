@@ -6,7 +6,7 @@ class Spider
   def initialize
   end
 
-  def self.start(bot_id: 2)
+  def self.start(bot_id = 2)
     new.start(bot_id)
   end
 

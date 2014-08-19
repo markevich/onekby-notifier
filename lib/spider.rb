@@ -7,6 +7,8 @@ class Spider
   end
 
   def self.start(bot_id = 2)
+    # random pause 1-3 min
+    sleep(rand(4)*60)
     new.start(bot_id)
   end
 

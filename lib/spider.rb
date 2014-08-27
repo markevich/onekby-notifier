@@ -108,10 +108,6 @@ class Spider
       }
     end.compact
 
-    offers.delete_if do |offer|
-      offer[:position] == 1
-    end
-
     magic(offers)
 
     return offers unless @session.has_link?('Следующая')

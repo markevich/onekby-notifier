@@ -19,7 +19,7 @@ set :deploy_via, :remote_cache
 set :copy_exclude, [ '.git' ]
 
 
-set :rvm_ruby_version, "2.1.2"
+set :rvm_ruby_version, "2.1.0"
 set :rvm_type, :system
 
 server "192.241.209.135", :app, :web, :db, primary: true

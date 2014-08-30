@@ -19,7 +19,6 @@ namespace :deploy do
 
   task :link_yml do
     run "ln -s #{shared_path}/config/database.yml #{release_path}/config/database.yml"
-    run "ln -s #{shared_path}/config/newrelic.yml #{release_path}/config/newrelic.yml"
   end
 
   before "deploy:assets:symlink", "deploy:link_yml"

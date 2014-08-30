@@ -1,5 +1,5 @@
 require "bundler/capistrano"
-require 'capistrano-rbenv'
+require 'rvm/capistrano'
 
 set :whenever_command, "bundle exec whenever"
 require "whenever/capistrano"
@@ -11,7 +11,7 @@ load 'config/recipes/sidekiq'
 load 'config/recipes/monit'
 
 set :application, "onekby-notifier"
-set :deploy_to, "/home/deployer/#{application}"
+set :deploy_to, "/home/onek-bot/#{application}"
 
 set :branch, 'master'
 set :repository,  "git@github.com:markevich/onekby-notifier.git"
@@ -19,11 +19,12 @@ set :deploy_via, :remote_cache
 set :copy_exclude, [ '.git' ]
 
 
-set :rbenv_ruby_version, "2.1.0"
+set :rvm_ruby_version, "2.1.2"
+set :rvm_type, :system
 
-server "artoverflow.com", :app, :web, :db, primary: true
+server "192.241.209.135", :app, :web, :db, primary: true
 
-set :user, 'deployer'
+set :user, 'onek-bot'
 set :use_sudo, false
 
 default_run_options[:pty] = true

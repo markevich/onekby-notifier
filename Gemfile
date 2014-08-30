@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 gem 'rails', '4.0.0'
 
-gem 'mysql2'
+gem 'pg'
 
 gem 'sass-rails', '~> 4.0.0'
 
@@ -44,6 +44,6 @@ gem 'sidekiq'
 
 # Use Capistrano for deployment
 gem 'capistrano', group: :development
-gem 'capistrano-rbenv', group: :development
+gem 'rvm-capistrano', group: :development
 gem 'nokogiri'
 

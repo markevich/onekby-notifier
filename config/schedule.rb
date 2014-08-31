@@ -25,3 +25,6 @@ job_type :runner, "cd :path && bin/rails runner -e :environment ':task' :output"
 every '*/10 * * * *' do
   runner 'BotsLauncher.launch_all_bots'
 end
+every '0 1 * * *' do
+  command '/etc/init.d/sidekiq_onekby-notifier restart'
+end
